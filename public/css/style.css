@@ -1,0 +1,297 @@
+:root {
+  --bg-color: #F4F4F0;
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --accent: #FF3300; /* Safety Orange */
+  --border-color: #111111;
+  --border-width: 2px;
+  --shadow-offset: 4px;
+  
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-display);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- HEADER --- */
+header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background: var(--bg-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-title {
+  padding: 2rem 3rem;
+  border-right: var(--border-width) solid var(--border-color);
+  display: flex;
+  align-items: center;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.controls {
+  display: flex;
+  width: 100%;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: #FFF;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+  outline: none;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+input[type="text"]:focus {
+  transform: translate(2px, 2px);
+  box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+  background: #FFF9F5;
+  border-color: var(--accent);
+}
+
+input[type="text"]::placeholder {
+  color: var(--text-secondary);
+}
+
+.stats {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-top: var(--border-width) solid var(--border-color);
+  padding-top: 1rem;
+}
+
+/* --- TABLE --- */
+.table-wrapper {
+  margin: 2rem 3rem;
+  background: #FFF;
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: 8px 8px 0 var(--border-color);
+  overflow-x: auto;
+  flex: 1;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+  border-bottom: var(--border-width) solid var(--border-color);
+  border-right: var(--border-width) solid var(--border-color);
+}
+
+th:last-child, td:last-child {
+  border-right: none;
+}
+
+th {
+  background: var(--bg-color);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 0;
+}
+
+.resizable-header {
+  resize: horizontal;
+  overflow: hidden;
+  min-width: 150px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+tr {
+  background: #FFF;
+  color: var(--text-primary);
+  transition: background 0.1s, color 0.1s;
+}
+
+tr:hover {
+  background: var(--text-primary);
+  color: #FFF;
+}
+
+/* Specifically style dynamic elements when inverted */
+tr:hover .td-truncate,
+tr:hover .scrollable-content,
+tr:hover td.rating,
+tr:hover .json-content {
+  color: #FFF;
+}
+
+tr:hover .link-btn {
+  background: var(--accent);
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+  box-shadow: 2px 2px 0 var(--text-primary);
+}
+
+.td-truncate {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+}
+
+.link-btn {
+  display: inline-flex;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #FFF;
+  background: var(--text-primary);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: var(--border-width) solid var(--border-color);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+}
+
+.link-btn:hover {
+  background: var(--accent);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--border-color);
+}
+
+.rating {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rating::before {
+  content: "★";
+  color: var(--accent);
+}
+
+/* Custom Scrollbar for brutalist look */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-left: var(--border-width) solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border: var(--border-width) solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Layout for complex json/scrollable text */
+.scrollable-content {
+  max-width: 380px;
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: normal;
+  line-height: 1.5;
+  color: var(--text-primary);
+  padding: 0.5rem;
+  background: rgba(0,0,0,0.03);
+  border: 1px dashed var(--border-color);
+}
+
+tr:hover .scrollable-content {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.json-content {
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+/* Animations */
+@keyframes slideUpHeavy {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr {
+  animation: slideUpHeavy 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@media (max-width: 900px) {
+  header {
+    grid-template-columns: 1fr;
+  }
+  .header-title {
+    border-right: none;
+    border-bottom: var(--border-width) solid var(--border-color);
+  }
+  .table-wrapper {
+    margin: 1rem;
+  }
+}

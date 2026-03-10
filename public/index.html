@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maps Scraper Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Specific overrides for the scraper form page */
+    .hero-section {
+      padding: 4rem 3rem;
+      border-bottom: var(--border-width) solid var(--border-color);
+      background: var(--text-primary);
+      color: var(--bg-color);
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 6rem);
+      margin: 0 0 1rem 0;
+      color: #FFF;
+      text-transform: uppercase;
+      line-height: 0.85;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .form-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 900px) {
+      .form-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    form {
+      padding: 3rem;
+      border-right: var(--border-width) solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .helper-text {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    /* Style the form inputs similar to search */
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      background: #FFF;
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--border-color);
+      outline: none;
+      transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      transform: translate(2px, 2px);
+      box-shadow: calc(var(--shadow-offset) - 2px) calc(var(--shadow-offset) - 2px) 0 var(--border-color);
+      background: #FFF9F5;
+      border-color: var(--accent);
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border: var(--border-width) solid var(--border-color);
+      background: #FFF;
+      cursor: pointer;
+      position: relative;
+    }
+
+    input[type="checkbox"]:checked {
+      background: var(--accent);
+    }
+
+    input[type="checkbox"]:checked::after {
+      content: "X";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #FFF;
+      font-size: 14px;
+    }
+
+    .submit-btn {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      padding: 1.5rem;
+      background: var(--accent);
+      color: #FFF;
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: 6px 6px 0 var(--border-color);
+      cursor: pointer;
+      transition: all 0.1s ease;
+      margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 8px 8px 0 var(--border-color);
+    }
+
+    .submit-btn:active {
+      transform: translate(4px, 4px);
+      box-shadow: 2px 2px 0 var(--border-color);
+    }
+
+    .submit-btn:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+      transform: translate(0, 0);
+      box-shadow: 6px 6px 0 var(--border-color);
+    }
+
+    /* Polling/Status Area */
+    .status-panel {
+      padding: 3rem;
+      background: #FFF;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .status-header {
+      font-size: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-bottom: var(--border-width) solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    #jobStatus {
+      font-family: var(--font-mono);
+      padding: 1rem;
+      background: var(--bg-color);
+      border: 1px dashed var(--border-color);
+      white-space: pre-wrap;
+      min-height: 150px;
+    }
+
+    #viewResultsBtn {
+      display: none;
+      text-align: center;
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 2rem;
+      padding: 2rem;
+      background: var(--text-primary);
+      color: var(--accent);
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: 8px 8px 0 var(--accent);
+      transition: all 0.1s ease;
+      text-transform: uppercase;
+    }
+
+    #viewResultsBtn:hover {
+      transform: translate(-4px, -4px);
+      box-shadow: 12px 12px 0 var(--accent);
+      color: #FFF;
+    }
+
+    .view-existing {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-decoration: underline;
+      text-transform: uppercase;
+    }
+
+    .view-existing:hover {
+      color: var(--accent);
+    }
+
+    /* Job Archive Table */
+    .jobs-section {
+      padding: 3rem;
+      border-top: var(--border-width) solid var(--border-color);
+      background: #FFF;
+    }
+
+    .jobs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: 6px 6px 0 var(--border-color);
+    }
+
+    .jobs-table th,
+    .jobs-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: var(--border-width) solid var(--border-color);
+      border-right: var(--border-width) solid var(--border-color);
+    }
+
+    .jobs-table th:last-child,
+    .jobs-table td:last-child {
+      border-right: none;
+    }
+
+    .jobs-table th {
+      background: var(--bg-color);
+      font-family: var(--font-display);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .jobs-table tr {
+      transition: background 0.1s;
+    }
+
+    .jobs-table tr:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+
+    .badge.completed,
+    .badge.finished {
+      background: var(--text-primary);
+      color: #FFF;
+      border-color: var(--text-primary);
+    }
+
+    .badge.pending,
+    .badge.running {
+      background: var(--accent);
+      color: #FFF;
+      border-color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      box-shadow: 3px 3px 0 var(--border-color);
+    }
+
+    .btn-sm:hover {
+      box-shadow: 5px 5px 0 var(--border-color);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header style="grid-template-columns: 1fr;">
+    <div class="header-title" style="border-right: none; justify-content: space-between;">
+      <h1>SCRAPER HUB</h1>
+      <a href="viewer.html" class="link-btn">OPEN VIEWER</a>
+    </div>
+  </header>
+
+  <div class="hero-section">
+    <h2 class="hero-title">INITIATE<br />SCRAPE JOB</h2>
+    <p class="hero-subtitle">// NEW EXTRACTION TASK</p>
+  </div>
+
+  <div class="form-container">
+    <form id="scraperForm">
+      <div class="form-group">
+        <label for="name">Job Name *</label>
+        <input type="text" id="name" name="name" required placeholder="E.g., Coffee shops Ilion" />
+      </div>
+
+      <div class="form-group">
+        <label for="keywords">Keywords *</label>
+        <input type="text" id="keywords" name="keywords" required placeholder="E.g., coffee in ilion, cafe" />
+        <div class="helper-text">Comma-separated list of keywords to search for.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="lang">Language</label>
+        <input type="text" id="lang" name="lang" value="en" placeholder="E.g., en, el, es" />
+      </div>
+
+      <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label for="zoom">Zoom Level</label>
+          <input type="number" id="zoom" name="zoom" value="15" min="1" max="21" />
+        </div>
+        <div>
+          <label for="depth">Depth</label>
+          <input type="number" id="depth" name="depth" value="1" min="1" />
+        </div>
+      </div>
+
+      <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label for="lat">Latitude (Opt)</label>
+          <input type="text" id="lat" name="lat" placeholder="E.g., 38.032" />
+        </div>
+        <div>
+          <label for="lon">Longitude (Opt)</label>
+          <input type="text" id="lon" name="lon" placeholder="E.g., 23.693" />
+        </div>
+      </div>
+
+      <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label for="radius">Radius (Opt)</label>
+          <input type="number" id="radius" name="radius" placeholder="Meters" />
+        </div>
+        <div>
+          <label for="max_time">Max Time (s)</label>
+          <input type="number" id="max_time" name="max_time" value="3600" />
+        </div>
+      </div>
+
+      <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+        <label class="checkbox-group">
+          <input type="checkbox" id="fast_mode" name="fast_mode" />
+          Fast Mode
+        </label>
+        <label class="checkbox-group">
+          <input type="checkbox" id="email" name="email" />
+          Extract Emails
+        </label>
+      </div>
+
+      <button type="submit" id="submitBtn" class="submit-btn">DISPATCH JOB</button>
+    </form>
+
+    <div class="status-panel">
+      <h3 class="status-header">SYSTEM STATUS</h3>
+      <div id="jobStatus">Awaiting job dispatch...</div>
+      <a href="#" id="viewResultsBtn" target="_blank">VIEW RESULTS</a>
+    </div>
+  </div>
+
+  <div class="jobs-section">
+    <h2 class="hero-title"
+      style="color: var(--text-primary); font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 2rem;">JOB ARCHIVE</h2>
+    <div style="overflow-x: auto;">
+      <table class="jobs-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Keywords</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="jobsTbody">
+          <tr>
+            <td colspan="6">Loading archivelogs...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/scraper.js"></script>
+</body>
+
+</html>

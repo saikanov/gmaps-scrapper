@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maps Data Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <header>
+    <div class="header-title">
+      <h1>MAPS DATA<br />VIEWER</h1>
+      <a href="index.html" class="link-btn" style="margin-left: 1rem;">NEW SCRAPE</a>
+    </div>
+    <div class="header-actions">
+      <div class="controls">
+        <input type="text" id="searchInput" placeholder="SEARCH ALL COLUMNS..." />
+      </div>
+      <div id="stats" class="stats">Loading...</div>
+    </div>
+  </header>
+
+  <div class="table-wrapper">
+    <table id="dataTable">
+      <thead>
+        <tr id="tableHead"></tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- PapaParse for high-performance CSV parsing in the browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+
+</html>

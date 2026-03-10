@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  gmaps-scraper:
+    image: gosom/google-maps-scraper:latest
+    container_name: gmaps-scraper
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./gmapsdata:/gmapsdata
+    command: [
+      "-addr", ":8080",
+      "-data-folder", "/gmapsdata",
+      "-email"
+    ]
+    restart: unless-stopped
+
+  frontend:
+    image: nginx:stable-alpine
+    container_name: gmaps-frontend
+    ports:
+      - "80:80"
+      - "8000:80"
+    volumes:
+      - ./public:/usr/share/nginx/html:ro 
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./gmapsdata:/usr/share/nginx/html/gmapsdata:ro
+    depends_on:
+      - gmaps-scraper
+    restart: unless-stopped

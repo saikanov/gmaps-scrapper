@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+HostUrl=http://localhost:8080/static/spec/spec.yaml
+ReferrerUrl=http://localhost:8080/api/docs
