@@ -4,8 +4,10 @@ services:
   gmaps-scraper:
     image: gosom/google-maps-scraper:latest
     container_name: gmaps-scraper
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
+    networks:
+      - web
     volumes:
       - ./gmapsdata:/gmapsdata
     command: ["-addr", ":8080", "-data-folder", "/gmapsdata", "-email"]
@@ -14,9 +16,10 @@ services:
   frontend:
     image: nginx:stable-alpine
     container_name: gmaps-frontend
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "80"
+    networks:
+      - web
     volumes:
       - ./public:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
