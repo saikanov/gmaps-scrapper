@@ -77,6 +77,13 @@ function renderTable(data) {
         thead.appendChild(th);
     });
 
+    const actionTh = document.createElement('th');
+    const actionDiv = document.createElement('div');
+    actionDiv.className = 'resizable-header';
+    actionDiv.textContent = 'Actions';
+    actionTh.appendChild(actionDiv);
+    thead.appendChild(actionTh);
+
     // Render rows
     tbody.innerHTML = '';
 
@@ -164,8 +171,74 @@ function renderTable(data) {
 
             tr.appendChild(td);
         });
+
+        const actionTd = document.createElement('td');
+        const sheetBtn = document.createElement('button');
+        sheetBtn.textContent = 'Add to Sheet';
+        sheetBtn.className = 'link-btn';
+        sheetBtn.style.cursor = 'pointer';
+        sheetBtn.style.whiteSpace = 'nowrap';
+        sheetBtn.style.border = 'none';
+        sheetBtn.style.fontSize = '0.75rem';
+        sheetBtn.onclick = () => fillGoogleSheet(row, sheetBtn);
+        actionTd.appendChild(sheetBtn);
+        tr.appendChild(actionTd);
+
         tbody.appendChild(tr);
     });
+}
+
+async function fillGoogleSheet(row, btn) {
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+
+    try {
+        let date = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+        
+        let emails = row['emails'] || '';
+        if (emails && typeof emails === 'string' && emails.startsWith('[')) {
+            try {
+                const parsed = JSON.parse(emails);
+                emails = Array.isArray(parsed) && parsed.length > 0 ? parsed.join(', ') : emails;
+            } catch (e) {}
+        }
+
+        const payload = {
+            date: date,
+            companyName: row['title'] || '',
+            pic: '',
+            position: '',
+            phone: row['phone'] || '',
+            email: emails || '',
+            country: row['country'] || row['state'] || '',
+            city: row['city'] || '',
+            address: row['address'] || '',
+            accountExecutive: '',
+            noted: row['link'] || ''
+        };
+
+        const response = await fetch('/api/sheets/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to send data to Google Sheets.');
+        }
+
+        btn.textContent = 'Added \u2713';
+        btn.style.backgroundColor = '#10b981';
+        btn.style.color = '#111';
+    } catch (error) {
+        console.error('Error:', error);
+        btn.textContent = 'Error';
+        btn.disabled = false;
+        alert(error.message);
+    }
 }
 
 function formatHeader(header) {

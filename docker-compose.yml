@@ -24,6 +24,18 @@ services:
       - ./gmapsdata:/usr/share/nginx/html/gmapsdata:ro
     depends_on:
       - gmaps-scraper
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: gmaps-backend
+    expose:
+      - "8000"
+    networks:
+      - web
+    environment:
+      - GOOGLE_SHEET_WEB_APP_URL=${GOOGLE_SHEET_WEB_APP_URL:-}
     restart: unless-stopped
 
 networks:
