@@ -30,10 +30,12 @@ services:
     restart: unless-stopped
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: gmaps-backend
-    expose:
-      - "8000"
+    ports:
+      - "8089:8000"
     networks:
       - web
     environment:
@@ -52,19 +54,6 @@ services:
         condition: service_healthy
       gmaps-scraper:
         condition: service_started
-    restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    container_name: gmaps-frontend
-    ports:
-      - "8089:80"
-    expose:
-      - "80"
-    networks:
-      - web
-    depends_on:
-      - backend
     restart: unless-stopped
 
 networks:

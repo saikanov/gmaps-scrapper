@@ -14,13 +14,16 @@ See [`requirements.md`](./requirements.md) for the full product/technical spec
 
 ```
 Vue 3 SPA  ──/api/──▶  FastAPI brain  ──▶  gosom/google-maps-scraper (engine)
-(frontend)             (backend)      ──▶  Postgres (campaign/job/lead)
-                                      ──▶  vLLM (keyword-gen + scoring + enrichment)
-                                      ──▶  Apps Script (Google Sheet export)
+(static, served         (backend)      ──▶  Postgres (campaign/job/lead)
+ by FastAPI)                          ──▶  vLLM (keyword-gen + scoring + enrichment)
+                                       ──▶  Apps Script (Google Sheet export)
 ```
 
 - **backend/** — FastAPI orchestrator. Models, dedup cascade, ingest, the two AI
-  touchpoints, a background poller that ingests finished scrape jobs.
+  touchpoints, a background poller that ingests finished scrape jobs. Its Docker
+  image also builds the Vue SPA and serves the static bundle directly (mounted at
+  `/`, with history-mode fallback to `index.html`) — there's no separate nginx
+  frontend container.
 - **frontend/** — Vue 3 + Vite + TS + Pinia + Vue Router + Tailwind + PrimeVue.
 - **gosom** — pure scraping engine, never modified.
 - **google_apps_script.js** — Sheet web app (batch insert, per-campaign tab).
@@ -40,8 +43,8 @@ Set secrets in `.env` (see `.env.example`): `LLM_HOST`, `LLM_MODEL`,
 docker compose up --build
 ```
 
-- Frontend: served by the `frontend` container on the `web` network (port 80).
-- Backend API: `gmaps-backend:8000`, proxied at `/api/` by the frontend nginx.
+- Everything (SPA + API): the `backend` container, published on `localhost:8089`
+  (frontend at `/`, API at `/api/`).
 - Postgres: `gmaps-postgres:5432` (volume `pgdata`).
 
 ## LLM note (vLLM / qwen)

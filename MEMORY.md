@@ -15,8 +15,33 @@ old vanilla-JS tool into the target architecture, all 3 phases at once.
   `frontend/`. Old `public/*.html` deprecated (not deleted). Design = "trade/customs
   manifest" identity: harbor-ink + maritime-teal, Space Grotesk / Inter / IBM Plex Mono,
   status chips + mono score badges. Builds clean (`npm run build`, `npm run typecheck`).
-- **Postgres + nginx** wired in `docker-compose.yml`; nginx now proxies ALL `/api/`
-  → backend (backend talks to gosom itself). gosom engine unchanged (locked §2.3).
+- **Postgres** wired in `docker-compose.yml`. gosom engine unchanged (locked §2.3).
+
+### 2026-06-20: dropped the nginx frontend container
+- Diagnosed a prod 502 (`gmaps.saikanov.com`) down to the deploy host's Docker
+  engine being stopped — unrelated to app code, but while in there the user asked
+  to simplify: no more separate nginx container for the SPA.
+- `backend/Dockerfile` is now multi-stage: stage 1 (`node:22-alpine`) builds
+  `frontend/` (`npm run build`), stage 2 (python) copies the dist into
+  `backend/static/`. Build context moved to repo root (`docker-compose.yml`:
+  `build.context: .`, `build.dockerfile: backend/Dockerfile`) so the Dockerfile
+  can reach both `backend/` and `frontend/`.
+- `app/main.py` mounts a `SPAStaticFiles(StaticFiles)` subclass at `/` (added
+  *after* the API routers, so `/api/*` still wins matching first). It overrides
+  `get_response` to catch the 404 **exception** Starlette's `StaticFiles` raises
+  for missing files (not a 404 response — easy gotcha, caught it via a quick
+  `TestClient` script) and re-serves `index.html` for Vue Router history-mode
+  fallback.
+- Deleted `frontend/Dockerfile`, `frontend/nginx.conf`, `frontend/.dockerignore`,
+  `backend/.dockerignore` (replaced by a root-level `.dockerignore`). Removed the
+  `frontend` service from `docker-compose.yml`; `backend` now publishes
+  `8089:8000` directly (was `frontend` on `8089:80`).
+- Root `nginx.conf` / `public/` predate the Vue rewrite and were already
+  unreferenced by docker-compose — left alone, out of scope.
+- **Action needed on the actual deploy host**: whatever fronts Cloudflare
+  (tunnel/reverse-proxy ingress) pointed at `gmaps-frontend:80` / port `8089` on
+  the *old* container — confirm it now reaches the `gmaps-backend` container on
+  the same `8089:8000` mapping after this change ships.
 
 ### CRITICAL: vLLM qwen "thinking" gotcha (cost me real debugging time)
 - The model is a reasoning model. With thinking ON it **intermittently returns empty

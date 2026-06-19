@@ -7,9 +7,13 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import Response
 
 from . import llm
 from .config import settings
@@ -51,3 +55,26 @@ async def health():
         "sheet_configured": bool(settings.google_sheet_web_app_url),
         "enrichment_threshold": settings.enrichment_score_threshold,
     }
+
+
+# ---------- Serve the built Vue SPA (no separate nginx container) ----------
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+
+if STATIC_DIR.is_dir():
+
+    class SPAStaticFiles(StaticFiles):
+        async def get_response(self, path: str, scope) -> Response:
+            try:
+                response = await super().get_response(path, scope)
+            except StarletteHTTPException as exc:
+                if exc.status_code != 404:
+                    raise
+                # Vue Router history mode: let the SPA handle unknown paths.
+                return await super().get_response("index.html", scope)
+            if response.status_code == 404:
+                return await super().get_response("index.html", scope)
+            return response
+
+    # Mounted last so it only catches requests the API routers above didn't.
+    app.mount("/", SPAStaticFiles(directory=STATIC_DIR, html=True), name="spa")
