@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gmaps-postgres
+    environment:
+      POSTGRES_USER: gmaps
+      POSTGRES_PASSWORD: gmaps
+      POSTGRES_DB: gmaps
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gmaps"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
   gmaps-scraper:
     image: gosom/google-maps-scraper:latest
     container_name: gmaps-scraper
@@ -11,22 +29,6 @@ services:
     command: ["-addr", ":8080", "-data-folder", "/gmapsdata", "-email"]
     restart: unless-stopped
 
-  frontend:
-    image: nginx:stable-alpine
-    container_name: gmaps-frontend
-    expose:
-      - "80"
-    networks:
-      - web
-    volumes:
-      - ./public:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./gmapsdata:/usr/share/nginx/html/gmapsdata:ro
-    depends_on:
-      - gmaps-scraper
-      - backend
-    restart: unless-stopped
-
   backend:
     build: ./backend
     container_name: gmaps-backend
@@ -35,9 +37,39 @@ services:
     networks:
       - web
     environment:
+      - DATABASE_URL=postgresql+asyncpg://gmaps:gmaps@postgres:5432/gmaps
+      - GOSOM_URL=http://gmaps-scraper:8080
+      - GMAPS_DATA_DIR=/gmapsdata
       - GOOGLE_SHEET_WEB_APP_URL=${GOOGLE_SHEET_WEB_APP_URL:-}
+      - LLM_HOST=${LLM_HOST:-}
+      - LLM_MODEL=${LLM_MODEL:-}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+    volumes:
+      # share the folder gosom writes CSVs into so ingest can read them
+      - ./gmapsdata:/gmapsdata:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gmaps-scraper:
+        condition: service_started
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: gmaps-frontend
+    ports:
+      - "8089:80"
+    expose:
+      - "80"
+    networks:
+      - web
+    depends_on:
+      - backend
     restart: unless-stopped
 
 networks:
   web:
     external: true
+
+volumes:
+  pgdata:

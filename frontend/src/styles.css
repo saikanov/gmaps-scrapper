@@ -1,0 +1,93 @@
+/* Layer order lets PrimeVue (styled) sit between Tailwind's reset and utilities
+   so preflight doesn't clobber components and utilities can still win. */
+@layer tailwind-base, primevue, tailwind-utilities;
+
+@layer tailwind-base {
+  @tailwind base;
+}
+@tailwind components;
+@layer tailwind-utilities {
+  @tailwind utilities;
+}
+
+/* Baraquette design tokens (DESIGN.md §9) — available to plain CSS too. */
+:root {
+  color-scheme: light;
+
+  /* Brand / gold */
+  --color-gold: #dbb600;
+  --color-gold-deep: #b89800;
+  --color-gold-soft: #dbb60099;
+  --color-gold-tint: rgba(219, 182, 0, 0.12);
+
+  /* Neutral dark (shell) */
+  --color-bg-dark: #0d0d0d;
+  --color-bg-mid: #1a1a1a;
+  --color-bg-card: #232323;
+  --color-bg-panel: #292b2b;
+
+  /* Neutral light (workspace) */
+  --color-bg-light: #ffffff;
+  --color-bg-gray: #f2f2f2;
+  --color-off-white: #fdfdfd;
+  --color-surface-gray: #c9c9c9;
+  --color-border: #d9d9d9;
+
+  /* Text */
+  --color-text: #1a1a1a;
+  --color-text-light: #ffffff;
+  --color-text-muted: #969696;
+  --color-text-dim: #a0a0a0;
+
+  /* Semantic */
+  --color-success: #2e7d5b;
+  --color-warning: #c77d00;
+  --color-danger: #c0392b;
+  --color-info: #2d6cb5;
+
+  /* Motion */
+  --transition-fast: 180ms ease;
+  --transition-base: 280ms ease;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+  margin: 0;
+}
+
+/* Tabular numerals for scores, ids, phones — single typeface, aligned columns. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Thin uppercase eyebrow label used across panels. */
+.eyebrow {
+  @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-300;
+}
+
+/* Keyboard focus floor — gold ring (DESIGN.md §8). */
+:where(button, a, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* PrimeVue DataTable density tuned for a dense daily-use board. */
+.p-datatable .p-datatable-tbody > tr > td {
+  @apply py-2 text-[13px];
+}
+.p-datatable .p-datatable-thead > tr > th {
+  @apply bg-paper text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-500;
+}

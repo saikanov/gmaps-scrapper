@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+backend/.venv*/
+.venv/
+
+# Node / Vue
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Scraper output + local secrets
+gmapsdata/*.csv
+gmapsdata/*.db
+.env
